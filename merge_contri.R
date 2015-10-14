@@ -43,9 +43,16 @@ test_cor<-function(rfc_preCnt_fin){
     for(y in year){
         print(y)
         rfc<-rfc_preCnt[rfc_preCnt$when==year,]
+        #plot(rfc$BFR~range01(rfc$rptCntPre))
+        #plot(rfc$BFR~range01(rfc$fixCntPre))
+        #plot(rfc$BFR~range01(rfc$cmtCntPre))
+
+        rfc[is.na(rfc)]<-0
         plot(rfc$BFR~range01(rfc$rptCntPre))
         plot(rfc$BFR~range01(rfc$fixCntPre))
         plot(rfc$BFR~range01(rfc$cmtCntPre))
+
+
     }
 
 }
