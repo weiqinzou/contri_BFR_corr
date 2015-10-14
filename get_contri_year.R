@@ -28,30 +28,45 @@ get_rpt_closed<-function(ori_rpt,rpt_thr){
    return(ori)
 }
 
+preContri<-function(contri_eachyear_d,contri_fout){
+#contri_eachyear_d is a dataframe which contains such items:
+    names(contri_eachyear_d)<-c("who","when","cnt")
+    contributors<-unique(contri_eachyear_d$who)
+#!!!!need to clear the contri_fout and write the head into the contri_fout before for loop
+    for(c in contributors){
+        contri<-contri_eachyear_d[contri_eachyear_d$who==c,]
+        contri<-contri[order(contri$who,contri$when),]
+        contri<-ddply(contri,.(who),transform,cntPre=cumsum(cnt)-cnt)
+        write.table(contri,contri_fout,sep=",",row.names=F,col.names=F,append=T)
+        gc()
+    }
+}
+
 #get each contributor's contribution by year. without divided by products.
 #note that the rpt file is all closed bugs containing file
 total_contri<-function(rpt_fin,fix_fin,cmt_fin,rpt_thr,contri_fout){
     r<-get_rpt_closed(rpt_fin,rpt_thr)
-    print('haha,get r')
-    print(head(r))
-    ryear<-ddply(r,.(reporter,year=substr(creation_ts,1,4)),summarize,rptCnt=length(bug_id),
-                 BFR=length(resolution[tolower(resolution)=="fixed"])/length(resolution))
-    names(ryear)<-c("who","when","rptCnt","BFR")    
+    ryear<-ddply(r,.(reporter,year=substr(creation_ts,1,4)),summarize,rptCnt=length(bug_id))
+    names(ryear)<-c("who","when","rptCnt")    
+    rm(r)
+    gc()
+    preContri(ryear,paste(rpt_fin,'preCnt',sep=''))
 #    ryear<-ryear[order(ryear$who,ryear$when),]
-    ryear<-ddply(ryear,.(who),transform,rptCntPre=cumsum(rptCnt)-rptCnt)
+    #ryear<-ddply(ryear,.(who),transform,rptCntPre=cumsum(rptCnt)-rptCnt)
+    print(nrow(ryear))
     print(head(ryear))
     q()
 
     f<-read.csv(fix_fin,header=T,sep=",")
     fyear<-ddply(f,.(fixer,year=substr(fixTime,1,4)),summarize,fixCnt=length(bug_id))
     names(fyear)<-c("who","when","fixCnt")
-    fyear<-fyear[order(fyear$who,fyear$when),]
+#    fyear<-fyear[order(fyear$who,fyear$when),]
     fyear<-ddply(fyear,.(who),transform,fixCntPre=cumsum(fixCnt)-fixCnt)
 
     c<-read.csv(cmt_fin,header=T,sep=",")
     cyear<-ddply(c,.(cmtor,year=substr(cmtTime,1,4)),summarize,cmtCnt=length(bug_id))
     names(cyear)<-c("who","when","cmtCnt")
-    cyear<-cyear[order(cyear$who,cyear$when),]
+#    cyear<-cyear[order(cyear$who,cyear$when),]
     cyear<-ddply(cyear,.(who),transform,cmtCntPre=cumsum(cmtCnt)-cmtCnt)
 
 #merge rptCnt,fixCnt and cmtCnt for each contributor by year
