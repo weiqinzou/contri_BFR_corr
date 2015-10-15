@@ -9,7 +9,7 @@ ori_rpt<-argv[1]
 ori_fix<-argv[2]
 ori_cmt<-argv[3]
 rpt_thr<-argv[4]
-
+proj_name<-argv[5]
 
 #get all closed bug reports
 get_rpt_closed<-function(ori_rpt){
@@ -45,15 +45,17 @@ get_rptor_BFR<-function(rpt_fin,rpt_thr){
 #active_rptor is a reporter list who reported less than N bug reports totally
 #contri_type indicates which kinds of contributions you are calculating for 
 #the active rptors
-get_contri<-function(rfc_d,active_rptor,contri_type){
+#proj_name indicates the project name  you conduct experiment on
+get_contri<-function(rfc_d,active_rptor,contri_type,proj_name){
 
     active_rptor<-unique(active_rptor)
     t<-rfc_d
+    names(t)<-c("bug_id","who","when")
     t<-t[t$who %in% active_rptor,]
     t$when<-substr(t$when,1,4)
     years<-unique(t$when)
     
-    contri_fout<-paste(contri_type,"contri",sep='_')
+    contri_fout<-paste(proj_name,contri_type,sep='_')
     head<-c("who","when","curCnt","preCnt\n")
     cat(head,file=contri_fout,sep=",",append=F)
     for(y in years){
@@ -77,22 +79,21 @@ get_contri<-function(rfc_d,active_rptor,contri_type){
     }
 }
 
-total_contri<-function(rpt_fin,fix_fin,cmt_fin,rpt_thr){
+total_contri<-function(rpt_fin,fix_fin,cmt_fin,rpt_thr,project_name){
     active_rptor<-get_active_rptor(rpt_fin,rpt_thr)
 
     r<-get_rpt_closed(rpt_fin)
     r<-r[,c("bug_id","reporter","creation_ts")]
-    names(r)<-c("bug_id","who","when")
-    get_contri(r,active_rptor,"rpt")
+    get_contri(r,active_rptor,"rpt",project_name)
 
     f<-read.csv(fix_fin,header=T,sep=",")
-    get_contri(f,active_rptor,"fix")
+    get_contri(f,active_rptor,"fix",project_name)
 
     c<-read.csv(cmt_fin,header=T,sep=",")
-    get_contri(c,active_rptor,"cmt")
+    get_contri(c,active_rptor,"cmt",project_name)
 
 }
 
-#get_rptor_BFR(ori_rpt,rpt_thr)
-total_contri(ori_rpt,ori_fix,ori_cmt,rpt_thr)
+get_rptor_BFR(ori_rpt,rpt_thr)
+total_contri(ori_rpt,ori_fix,ori_cmt,rpt_thr,proj_name)
 
