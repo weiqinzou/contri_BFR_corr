@@ -12,13 +12,6 @@ cmt_preCnt<-argv[3]
 rpt_BFR<-argv[4]
 rfc_preCnt<-argv[5]
 
-#normalize the numeric value
-range01<-function(x){
-  rng<-range(x,na.rm=TRUE)
-  (x-rng[1])/diff(rng)
-}
-
-
 #input data format:rpt|fix|cmt_preCnt contains: who, when, cnt,cntPre
 #rptBFR contains:who,when,BFR
 merge_preCnt<-function(rPreCnt_fin,fPreCnt_fin,cPreCnt_fin,
@@ -37,26 +30,4 @@ merge_preCnt<-function(rPreCnt_fin,fPreCnt_fin,cPreCnt_fin,
     write.table(brfc,rfc_fout,sep=",",col.names=T,row.names=F)
 }
 
-test_cor<-function(rfc_preCnt_fin){
-    rfc_preCnt<-read.csv(rfc_preCnt_fin,header=T,sep=",")
-    year<-unique(rfc_preCnt$when)
-    for(y in year){
-        print(y)
-        rfc<-rfc_preCnt[rfc_preCnt$when==year,]
-        #plot(rfc$BFR~range01(rfc$rptCntPre))
-        #plot(rfc$BFR~range01(rfc$fixCntPre))
-        #plot(rfc$BFR~range01(rfc$cmtCntPre))
-
-        rfc[is.na(rfc)]<-0
-        plot(rfc$BFR~range01(rfc$rptCntPre))
-        plot(rfc$BFR~range01(rfc$fixCntPre))
-        plot(rfc$BFR~range01(rfc$cmtCntPre))
-
-
-    }
-
-}
-#merge_preCnt(rpt_preCnt,fix_preCnt,cmt_preCnt,rpt_BFR,rfc_preCnt)
-
-
-test_cor(rfc_preCnt)
+merge_preCnt(rpt_preCnt,fix_preCnt,cmt_preCnt,rpt_BFR,rfc_preCnt)
