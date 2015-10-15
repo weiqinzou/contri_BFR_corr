@@ -53,17 +53,21 @@ get_contri<-function(rfc_d,active_rptor,contri_type){
     t$when<-substr(t$when,1,4)
     years<-unique(t$when)
     
-    out<-paste(rfc_fin,contri_type,sep='_')
+    contri_fout<-paste(contri_type,"contri",sep='_')
     head<-c("who","when","curCnt","preCnt\n")
-    cat(head,file=out,sep=",",append=F)
+    cat(head,file=contri_fout,sep=",",append=F)
     for(y in years){
-        contri<-dataframe(who=active_rptor)
+        contri<-data.frame(who=active_rptor)
         contri$when<-y
 
         cur<-t[as.numeric(t$when)==as.numeric(y),]
         pre<-t[as.numeric(t$when)<as.numeric(y),]
         curc<-ddply(cur,.(who),summarize,curCnt=length(bug_id))
-        prec<-ddply(pre,.(who),summarzie,preCnt=length(bug_id))
+        prec<-ddply(pre,.(who),summarize,preCnt=length(bug_id))
+        #for the first year,the prec will be none. thus the names of prec
+        #will be the same as pre. to make the program run correctly,
+        #we did the if branch
+        if(nrow(prec)==0)prec<-data.frame(who=NA,preCnt=NA)
 
         contri<-merge(contri,curc,by=c("who"),all.x=T)
         contri<-merge(contri,prec,by=c("who"),all.x=T)
@@ -89,6 +93,6 @@ total_contri<-function(rpt_fin,fix_fin,cmt_fin,rpt_thr){
 
 }
 
-get_rptor_BFR(ori_rpt,rpt_thr)
+#get_rptor_BFR(ori_rpt,rpt_thr)
 total_contri(ori_rpt,ori_fix,ori_cmt,rpt_thr)
 
