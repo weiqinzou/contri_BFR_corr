@@ -68,3 +68,20 @@ cal_corr_year<-function(BFR_rfc_d){
     }
 }
 
+relativeWhen<-function(bfr_d){
+    tt<-ddply(bfr_d,.(who),transform,whenRank=rank(when),whenDiff=when-min(when))
+    return(tt)
+}
+#!!!!!!!!!!!!cal relative time corr #############
+relativeWhen_corr<-function(t){
+#here t is a dataframe which contains following items:
+#"who","when","BFR","rptCnt","preRptCnt","fixCnt","preFixCnt","cmtCnt","preCmtCnt","whenRank","whenDiff"
+    print("whenRank's corr:")
+    wr<-t[,c(-2,-11)]#remove the when and whenDiff cols
+    names(wr)<-c("who","BFR","rptCnt","preRptCnt","fixCnt","preFixCnt","cmtCnt","preCmtCnt","when")
+    cal_corr_year(wr)
+    print("whenDiff's corr:")
+    wd<-t[,c(-2,-10)]
+    names(wd)<-c("who","BFR","rptCnt","preRptCnt","fixCnt","preFixCnt","cmtCnt","preCmtCnt","when")
+    cal_corr_year(wd)
+}
