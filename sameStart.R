@@ -19,7 +19,6 @@ sameStartLevel<-function(BFR_rfc_fin,rpt_thr){
     for(z in bz){
         level<-t[t$bzone == z,]
         print(z)
-        
         latest_cal_corr(level)
         print
     }
