@@ -29,7 +29,7 @@ cal_CntBFR_corr<-function(contri_d){
     
     return(res)
 }
-
+###########!!!!!!!cal latest active when corr!!!!!!!!!!##########
 #BFR_validRpt_fin contains:who,when,BFR,rptCnt,validRptCnt,preValidRptCnt
 latest_cal_corr<-function(BFR_validRpt_fin,rpt_thr){
     t<-read.table(BFR_validRpt_fin,header=T,sep=",")
@@ -48,9 +48,6 @@ latest_cal_corr<-function(BFR_validRpt_fin,rpt_thr){
         print(cor_res)
     }
 }
-latest_cal_corr(BFR_validRpt,rpt_thr)
-
-
 
 ########!!!!!!!!relative when!!!!!!###############
 relativeWhen<-function(bfr_d){
@@ -99,6 +96,7 @@ relativeWhen_corr<-function(t){
     names(wd)<-c("who","BFR","rptCnt","validRptCnt","preValidRptCnt","when")
     cal_corr_year(wd)
 }
+###########!!!!!!!cal relative when corr!!!!!!!!!!##########
 run_relativeWhen<-function(validRpt_fin,rpt_thr){
     t<-read.csv(validRpt_fin,header=T,sep=",")
     
@@ -108,4 +106,23 @@ run_relativeWhen<-function(validRpt_fin,rpt_thr){
     #who,when,BFR,rptCnt,validRptCnt,preValidRptCnt,whenRank,whenDiff
     relativeWhen_corr(t)
 }
-run_relativeWhen(BFR_validRpt,rpt_thr)
+###########!!!!!!!cal absolute when corr!!!!!!!!!!##########
+run_absoluteWhen<-function(validRpt_fin,rpt_thr){
+    t<-read.csv(validRpt_fin,header=T,sep=",")
+    
+    t<-t[as.numeric(t$rptCnt)>=as.numeric(rpt_thr),]
+    #header for t:
+    #who,when,BFR,rptCnt,validRptCnt,preValidRptCnt,whenRank,whenDiff
+    cal_corr_year(t)   
+}
+
+###final run-control function####
+run_corr<-function(BFR_validRpt,rpt_thr){
+    print("corr btw latest active year's BFR and validRpt contri")
+    latest_cal_corr(BFR_validRpt,rpt_thr)
+    print("corr btw relative year's BFR and validRpt contri")
+    run_relativeWhen(BFR_validRpt,rpt_thr)
+    print("corr btw absolute year's BFR and validRpt contri")
+    run_absoluteWhen(BFR_validRpt,rpt_thr)
+}
+run_corr(BFR_validRpt,rpt_thr)
