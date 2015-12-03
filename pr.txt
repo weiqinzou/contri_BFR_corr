@@ -1,0 +1,2 @@
+#1 step 1 完全在自己电脑上测试下merge的内部机制
+#2 step2 记得多次commit且多次pr
